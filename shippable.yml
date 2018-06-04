@@ -43,7 +43,7 @@ jobs:
                 - resource_group_location: "eastus"
                 - vnet_name: "demo_vnet_tf"
                 - vnet_location: "eastus"
-                - AZURE_SUBSCRIPTION_ID: "" # TODO: Add azure subscription ID
+                - AZURE_SUBSCRIPTION_ID: "65fe9858-6094-445a-a5c0-50932470d6e1"
           script:
             - pushd $(shipctl get_resource_state "az_vnet_tf_repo")
             - export AZURE_CLIENT_ID=$(shipctl get_integration_resource_field az_vnet_tf_creds "appid")
