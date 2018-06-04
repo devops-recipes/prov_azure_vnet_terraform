@@ -1,0 +1,67 @@
+resources:
+# Automation scripts repo
+  - name: azure_vnet_tf_repo
+    type: gitRepo
+    integration: "drship_github"
+    versionTemplate:
+      sourceName: "devops-recipes/prov_azure_vnet_terraform"
+      branch: master
+
+# Azure credentials
+  - name: azure_vnet_tf_creds
+    type: integration
+    integration: "drship_azure"
+
+# Terraform State
+  - name: azure_vnet_tf_state
+    type: state
+
+# Output of Virtual Network provisioning
+  - name: azure_vnet_tf_info
+    type: params
+    versionTemplate:
+      params:
+        SEED: "initial_version"
+
+jobs:
+# Provision Azure Virtual Network with Terraform
+  - name: prov_azure_vnet_tf
+    type: runSh
+    steps:
+      - IN: azure_vnet_tf_repo
+        switch: off
+      - IN: azure_vnet_tf_state
+        switch: off
+      - IN: azure_vnet_tf_creds
+        switch: off
+      - TASK:
+          name: prov_vnet
+          runtime:
+            options:
+              env:
+                - resource_group_name: "demo_rg_tf"
+                - resource_group_location: "eastus"
+                - vnet_name: "demo_vnet_tf"
+                - vnet_location: "eastus"
+                - AZURE_SUBSCRIPTION_ID: "" # TODO: Add azure subscription ID
+          script:
+            - pushd $(shipctl get_resource_state "azure_vnet_tf_repo")
+            - shipctl copy_file_from_resource_state azure_vnet_tf_state terraform.tfstate .
+            - shipctl replace terraform.tfvars
+            - terraform init
+            - terraform plan -var-file=terraform.tfvars
+            - terraform apply -var-file=terraform.tfvars
+      - OUT: azure_vnet_tf_info
+        overwrite: true
+      - OUT: azure_vnet_tf_state
+    on_success:
+      script:
+        - shipctl put_resource_state_multi azure_vnet_tf_info "versionName=$vnet_name" "resource_group_name=$resource_group_name" "nic_id=$(terraform output nic_id)"
+    always:
+      script:
+        - shipctl copy_file_to_resource_state terraform.tfstate azure_vnet_tf_state
+        - popd
+    flags:
+      - azure_vnet
+      - azure
+      - terraform
