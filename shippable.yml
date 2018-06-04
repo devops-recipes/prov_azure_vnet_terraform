@@ -46,6 +46,9 @@ jobs:
                 - AZURE_SUBSCRIPTION_ID: "" # TODO: Add azure subscription ID
           script:
             - pushd $(shipctl get_resource_state "az_vnet_tf_repo")
+            - export AZURE_CLIENT_ID=$(shipctl get_integration_resource_field az_vnet_tf_creds "appid")
+            - export AZURE_CLIENT_SECRET=$(shipctl get_integration_resource_field az_vnet_tf_creds "password")
+            - export AZURE_TENANT_ID=$(shipctl get_integration_resource_field az_vnet_tf_creds "tenant")
             - shipctl copy_file_from_resource_state az_vnet_tf_state terraform.tfstate .
             - shipctl replace terraform.tfvars
             - terraform init
