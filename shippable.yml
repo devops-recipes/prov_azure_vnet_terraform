@@ -29,7 +29,6 @@ jobs:
     type: runSh
     steps:
       - IN: az_vnet_tf_repo
-        switch: off
       - IN: az_vnet_tf_state
         switch: off
       - IN: az_vnet_tf_creds
@@ -53,7 +52,7 @@ jobs:
             - shipctl replace terraform.tfvars
             - terraform init
             - terraform plan -var-file=terraform.tfvars
-            - terraform apply -var-file=terraform.tfvars
+            - terraform apply -auto-approve -var-file=terraform.tfvars
       - OUT: az_vnet_tf_info
         overwrite: true
       - OUT: az_vnet_tf_state
