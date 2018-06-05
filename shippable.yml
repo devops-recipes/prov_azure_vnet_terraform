@@ -29,7 +29,6 @@ jobs:
     type: runSh
     steps:
       - IN: az_vnet_tf_repo
-        switch: off
       - IN: az_vnet_tf_state
         switch: off
       - IN: az_vnet_tf_creds
