@@ -53,7 +53,7 @@ jobs:
             - shipctl replace terraform.tfvars
             - terraform init
             - terraform plan -var-file=terraform.tfvars
-            - terraform apply -var-file=terraform.tfvars
+            - terraform apply -auto-approve -var-file=terraform.tfvars
       - OUT: az_vnet_tf_info
         overwrite: true
       - OUT: az_vnet_tf_state
